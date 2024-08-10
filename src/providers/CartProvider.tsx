@@ -59,7 +59,6 @@ const CartProvider = ({ children }: PropsWithChildren) => {
     (sum, item) => (sum += item.product.price * item.quantity),
     0
   );
-
   return (
     <CartContext.Provider value={{ items, addItem, updateQuantity, total }}>
       {children}

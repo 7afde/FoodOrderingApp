@@ -14,7 +14,9 @@ const CartScreen = () => {
         keyExtractor={(item) => item.id}
         contentContainerClassName="p-2 gap-2"
       />
-      <Text className="mt-4 pl-4 text-xl font-psemibold">Total: ${total}</Text>
+      <Text className="mt-4 pl-4 text-xl font-psemibold">
+        Total: ${total.toFixed(2)}
+      </Text>
       <Button text="Checkout" />
 
       <StatusBar style={Platform.OS == "ios" ? "light" : "auto"} />
