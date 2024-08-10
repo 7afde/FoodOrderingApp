@@ -1,16 +1,18 @@
-import { View, Text, TextInput, Image } from "react-native";
+import { View, Text, TextInput, Image, Alert } from "react-native";
 import { useState } from "react";
 import Button from "@/components/Button";
 import { defaultImage } from "@/components/ProductListItem";
 import * as ImagePicker from "expo-image-picker";
-import { Stack } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 
 const CreateProductScreen = () => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [image, setImage] = useState<string | null>(null);
-
   const [errors, setErrors] = useState("");
+
+  const { id } = useLocalSearchParams();
+  const isUpdating = !!id;
 
   const resetFields = () => {
     setName("");
@@ -39,10 +41,26 @@ const CreateProductScreen = () => {
     return true;
   };
 
+  const onSubmit = () => {
+    if (isUpdating) {
+      onUpdate();
+    } else {
+      onCreate();
+    }
+  };
+
   const onCreate = () => {
     if (!validateInputs()) return;
 
     console.warn("Create product", name, price);
+
+    resetFields();
+  };
+
+  const onUpdate = () => {
+    if (!validateInputs()) return;
+
+    console.warn("Update product", name, price);
 
     resetFields();
   };
@@ -60,9 +78,29 @@ const CreateProductScreen = () => {
     }
   };
 
+  const onDelete = () => {
+    console.warn("Delete product");
+  };
+
+  const confirmDelete = () => {
+    Alert.alert(
+      "Delete Product",
+      "Are you sure you want to delete this product?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        { text: "Delete", style: "destructive", onPress: onDelete },
+      ]
+    );
+  };
+
   return (
     <View className="flex-1 justify-center px-4">
-      <Stack.Screen options={{ title: "Create Product" }} />
+      <Stack.Screen
+        options={{ title: isUpdating ? "Update Product" : "Create Product" }}
+      />
 
       <Image
         source={{ uri: image || defaultImage }}
@@ -93,7 +131,15 @@ const CreateProductScreen = () => {
       />
 
       <Text className="text-red-500 font-pregular">{errors}</Text>
-      <Button onPress={onCreate} text="Create" />
+      <Button onPress={onSubmit} text={isUpdating ? "Update" : "Create"} />
+      {isUpdating && (
+        <Text
+          onPress={confirmDelete}
+          className="text-red-500 mt-2 text-center underline underline-thickness:1 underline-offset:2 font-psemibold"
+        >
+          Delete
+        </Text>
+      )}
     </View>
   );
 };
