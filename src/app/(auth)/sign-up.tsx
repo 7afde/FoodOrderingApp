@@ -14,19 +14,7 @@ const SignUpScreen = () => {
     const { error } = await supabase.auth.signUp({ email, password });
 
     if (error) Alert.alert(error.message);
-    else
-      Alert.alert(
-        "Account created successfully",
-        "Go to the sign in page to log in",
-        [
-          {
-            text: "Ok",
-            onPress: () => {
-              router.push("/sign-in");
-            },
-          },
-        ]
-      );
+
     setLoading(false);
   };
 
