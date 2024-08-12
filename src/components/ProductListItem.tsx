@@ -1,9 +1,10 @@
 import { Image, Text, Pressable } from "react-native";
 import { Link, useSegments } from "expo-router";
 import { Product } from "@/types";
+import { Tables } from "@/database.types";
 
 type Props = {
-  product: Product;
+  product: Tables<"products">;
 };
 
 export const defaultImage =
