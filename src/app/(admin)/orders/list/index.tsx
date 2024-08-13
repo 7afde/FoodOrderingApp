@@ -7,6 +7,7 @@ import {
 import OrderListItem from "@/components/OrderListItem";
 import { useAdminOrdersList } from "@/api/orders";
 import { useState } from "react";
+import { useCreateOrderSubscription } from "@/api/orders/subscription";
 
 export default function OrdersScreen() {
   const [refreching, setRefreching] = useState(false);
@@ -16,6 +17,8 @@ export default function OrdersScreen() {
     error,
     refetch,
   } = useAdminOrdersList({ archived: false });
+
+  useCreateOrderSubscription();
 
   const onRefresh = async () => {
     setRefreching(true);

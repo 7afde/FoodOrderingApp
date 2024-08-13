@@ -7,10 +7,12 @@ import {
 import OrderListItem from "@/components/OrderListItem";
 import { useState } from "react";
 import { useMyOrdersList } from "@/api/orders";
+import { useUpdateAllOrdersSubscription } from "@/api/orders/subscription";
 
 export default function OrdersScreen() {
   const [refreching, setRefreching] = useState(false);
   const { data: orders, isLoading, error, refetch } = useMyOrdersList();
+  useUpdateAllOrdersSubscription();
 
   const onRefresh = async () => {
     setRefreching(true);
