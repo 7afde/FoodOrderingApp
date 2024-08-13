@@ -1,17 +1,33 @@
+import { useOrderDetails, useUpdateOrder } from "@/api/orders";
 import OrderItemListItem from "@/components/OrderItemListItem";
 import OrderListItem from "@/components/OrderListItem";
 import { OrderStatusList } from "@/types";
-import orders from "@assets/data/orders";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { View, Text, FlatList, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  Pressable,
+  ActivityIndicator,
+} from "react-native";
 
 const OrderDetailsScreen = () => {
-  const { id } = useLocalSearchParams();
+  const { id: idString } = useLocalSearchParams();
+  const id = idString as string;
 
-  const order = orders.find((order) => order.id.toString() === id);
+  const { data: order, isLoading, error } = useOrderDetails(id);
+  const { mutate: UpdateOrder } = useUpdateOrder();
 
-  if (!order) {
-    <Text>Order not found</Text>;
+  const updateStatus = (status: string) => {
+    UpdateOrder({ id, updatedFields: { status } });
+  };
+
+  if (isLoading) {
+    return <ActivityIndicator color="#2f95dc" />;
+  }
+
+  if (error || !order) {
+    return <Text>Failed to fetch products</Text>;
   }
 
   return (
@@ -30,7 +46,7 @@ const OrderDetailsScreen = () => {
               {OrderStatusList.map((status) => (
                 <Pressable
                   key={status}
-                  onPress={() => console.warn("Update status")}
+                  onPress={() => updateStatus(status)}
                   className={`border border-blue-500 p-2 rounded-md my-2 ${
                     order?.status === status ? "bg-blue-500" : "bg-transparent"
                   }`}

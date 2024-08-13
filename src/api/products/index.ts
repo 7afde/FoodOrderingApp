@@ -1,5 +1,4 @@
 import { supabase } from "@/lib/supabase";
-import { Product } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useProductList = () => {
@@ -55,9 +54,6 @@ export const useCreateProduct = () => {
     async onSuccess() {
       await queryClient.invalidateQueries({ queryKey: ["products"] });
     },
-    onError(error) {
-      console.log(error);
-    },
   });
 };
 
@@ -82,9 +78,6 @@ export const useUpdateProduct = () => {
       await queryClient.invalidateQueries({ queryKey: ["products"] });
       await queryClient.invalidateQueries({ queryKey: ["product", id] });
     },
-    onError(error) {
-      console.log(error);
-    },
   });
 };
 
@@ -101,9 +94,6 @@ export const useDeleteProduct = () => {
     },
     async onSuccess() {
       await queryClient.invalidateQueries({ queryKey: ["products"] });
-    },
-    onError(error) {
-      console.log(error);
     },
   });
 };
