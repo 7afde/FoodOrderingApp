@@ -4,18 +4,23 @@ import Button from "@/components/Button";
 import { defaultImage } from "@/components/ProductListItem";
 import * as ImagePicker from "expo-image-picker";
 import { router, Stack, useLocalSearchParams } from "expo-router";
+import * as FileSystem from "expo-file-system";
 import {
   useCreateProduct,
   useDeleteProduct,
   useProduct,
   useUpdateProduct,
 } from "@/api/products";
+import { randomUUID } from "expo-crypto";
+import { supabase } from "@/lib/supabase";
+import { decode } from "base64-arraybuffer";
 
 const CreateProductScreen = () => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const [errors, setErrors] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const { id: idString } = useLocalSearchParams();
   const id = idString as string;
@@ -28,7 +33,7 @@ const CreateProductScreen = () => {
 
   useEffect(() => {
     if (updatingProduct) {
-      console.log("Fetched product:", updatingProduct);
+      // console.log("Fetched product:", updatingProduct);
       setName(updatingProduct.name);
       setPrice(updatingProduct.price.toString());
       setImage(updatingProduct.image);
@@ -70,13 +75,17 @@ const CreateProductScreen = () => {
     }
   };
 
-  const onCreate = () => {
+  const onCreate = async () => {
+    setLoading(true);
     if (!validateInputs()) return;
 
+    const imagePath = await uploadImage();
+
     createProduct(
-      { name, price: parseFloat(price), image },
+      { name, price: parseFloat(price), image: imagePath },
       {
         onSuccess: () => {
+          setLoading(false);
           resetFields();
           router.back();
         },
@@ -85,12 +94,14 @@ const CreateProductScreen = () => {
   };
 
   const onUpdate = () => {
+    setLoading(true);
     if (!validateInputs()) return;
 
     updateProduct(
       { id, name, price: parseFloat(price), image },
       {
         onSuccess: () => {
+          setLoading(false);
           resetFields();
           router.back();
         },
@@ -133,6 +144,26 @@ const CreateProductScreen = () => {
     );
   };
 
+  const uploadImage = async () => {
+    if (!image?.startsWith("file://")) {
+      return;
+    }
+
+    const base64 = await FileSystem.readAsStringAsync(image, {
+      encoding: "base64",
+    });
+    const filePath = `${randomUUID()}.png`;
+    const contentType = "image/png";
+
+    const { data, error } = await supabase.storage
+      .from("product-images")
+      .upload(filePath, decode(base64), { contentType });
+
+    if (data) {
+      return data.path;
+    }
+  };
+
   return (
     <View className="flex-1 justify-center px-4">
       <Stack.Screen
@@ -168,7 +199,22 @@ const CreateProductScreen = () => {
       />
 
       <Text className="text-red-500 font-pregular">{errors}</Text>
-      <Button onPress={onSubmit} text={isUpdating ? "Update" : "Create"} />
+      <Button
+        onPress={onSubmit}
+        disabled={loading}
+        style={{
+          opacity: loading ? 0.5 : 1,
+        }}
+        text={
+          loading
+            ? isUpdating
+              ? "Updating..."
+              : "Creating..."
+            : isUpdating
+            ? "Update"
+            : "Create"
+        }
+      />
       {isUpdating && (
         <Text
           onPress={confirmDelete}

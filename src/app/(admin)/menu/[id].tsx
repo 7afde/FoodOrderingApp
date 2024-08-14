@@ -1,15 +1,16 @@
-import { View, Text, Image, Pressable, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, ActivityIndicator } from "react-native";
 import { Link, Stack, useLocalSearchParams } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 import { useProduct } from "@/api/products";
 import { defaultImage } from "@/components/ProductListItem";
+import RemoteImage from "@/components/RemoteImage";
 
 const ProductDetailsScreen = () => {
   const { id: idString } = useLocalSearchParams();
 
   const id = idString as string;
 
-  const { data: product, error, isLoading, refetch } = useProduct(id);
+  const { data: product, error, isLoading } = useProduct(id);
 
   if (isLoading) {
     return <ActivityIndicator color="#2f95dc" />;
@@ -41,16 +42,17 @@ const ProductDetailsScreen = () => {
         }}
       />
 
-      <Stack.Screen options={{ title: product.name }} />
+      <Stack.Screen options={{ title: product?.name }} />
 
-      <Image
-        source={{ uri: product.image || defaultImage }}
+      <RemoteImage
+        path={product.image}
+        fallback={defaultImage}
         className="w-full aspect-square"
         resizeMode="contain"
       />
 
-      <Text className="font-pbold text-2xl mt-4">{product.name}</Text>
-      <Text className="font-pbold text-lg ">${product.price}</Text>
+      <Text className="font-pbold text-2xl mt-4">{product?.name}</Text>
+      <Text className="font-pbold text-lg ">${product?.price}</Text>
     </View>
   );
 };

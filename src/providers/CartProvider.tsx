@@ -94,7 +94,7 @@ const CartProvider = ({ children }: PropsWithChildren) => {
 
     createOrderItems(orderItems, {
       onSuccess() {
-        console.log(order);
+        // console.log(order);
         clearCart();
         router.navigate(`/(user)/orders/${order.id}`);
       },
