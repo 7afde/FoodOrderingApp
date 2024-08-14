@@ -45,6 +45,9 @@ const SignInScreen = () => {
       <Button
         onPress={signInWithEmail}
         disabled={loading}
+        style={{
+          opacity: loading ? 0.5 : 1,
+        }}
         text={loading ? "Signing in..." : "Sign in"}
       />
       <Link

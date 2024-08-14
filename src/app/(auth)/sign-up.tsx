@@ -42,6 +42,9 @@ const SignUpScreen = () => {
       <Button
         onPress={signUpWithEmail}
         disabled={loading}
+        style={{
+          opacity: loading ? 0.5 : 1,
+        }}
         text={loading ? "Creating account..." : "Create account"}
       />
       <Link
