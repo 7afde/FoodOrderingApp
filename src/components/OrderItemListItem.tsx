@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import { Tables } from "@/types";
 import { defaultImage } from "./ProductListItem";
+import RemoteImage from "./RemoteImage";
 
 type OrderItemListItemProps = {
   item: { products: Tables<"products"> } & Tables<"order_items">;
@@ -9,8 +10,9 @@ type OrderItemListItemProps = {
 const OrderItemListItem = ({ item }: OrderItemListItemProps) => {
   return (
     <View className="bg-white rounded-[10] p-3 flex-1 flex-row items-center">
-      <Image
-        source={{ uri: item.products.image || defaultImage }}
+      <RemoteImage
+        path={item.products.image}
+        fallback={defaultImage}
         className="w-20 aspect-square self-center mr-3"
         resizeMode="contain"
       />
