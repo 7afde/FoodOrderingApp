@@ -1,6 +1,7 @@
 import { useOrderDetails, useUpdateOrder } from "@/api/orders";
 import OrderItemListItem from "@/components/OrderItemListItem";
 import OrderListItem from "@/components/OrderListItem";
+import { notifyUserAboutOrderUpdate } from "@/lib/notifications";
 import { OrderStatusList } from "@/types";
 import { Stack, useLocalSearchParams } from "expo-router";
 import {
@@ -18,8 +19,14 @@ const OrderDetailsScreen = () => {
   const { data: order, isLoading, error } = useOrderDetails(id);
   const { mutate: UpdateOrder } = useUpdateOrder();
 
-  const updateStatus = (status: string) => {
+  const updateStatus = async (status: string) => {
     UpdateOrder({ id, updatedFields: { status } });
+
+    console.log("Notify", order?.user_id);
+
+    if (order) {
+      await notifyUserAboutOrderUpdate({ ...order, status });
+    }
   };
 
   if (isLoading) {
